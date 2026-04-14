@@ -4,6 +4,7 @@ import cors from 'cors';
 import { initDb } from './db.js';
 import eventsRouter from './routes/events.js';
 import seedRouter from './routes/seed.js';
+import exploreRouter from './routes/explore.js';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/events', eventsRouter);
 app.use('/api/seed', seedRouter);
+app.use('/api/explore', exploreRouter);
 
 async function start(): Promise<void> {
   await initDb();

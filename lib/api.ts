@@ -5,7 +5,9 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 export interface ExploreEvent {
   id: string;
   event_name: string;
-  distinct_id: string;
+  device_id: string | null;
+  user_id: string | null;
+  resolved_user_id: string | null;
   properties: Record<string, unknown>;
   timestamp: string;
 }
@@ -86,7 +88,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 // ---- API functions ----
 
 export function fetchEventNames(): Promise<string[]> {
-  return get<string[]>('/api/events/names');
+  return get<{ names: string[] }>('/api/events/names').then((r) => r.names);
 }
 
 export function fetchEventProperties(
