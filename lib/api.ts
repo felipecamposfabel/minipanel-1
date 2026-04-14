@@ -15,6 +15,7 @@ export interface ExploreEvent {
 export interface TrendPoint {
   period: string;
   value: number;
+  breakdown?: string;
 }
 
 export interface TrendParams {
@@ -23,39 +24,53 @@ export interface TrendParams {
   end?: string;
   granularity?: 'day' | 'week';
   measure?: 'count' | 'unique_users';
+  aggregation?: 'sum' | 'avg' | 'min' | 'max';
+  property?: string;
+  breakdown?: string;
 }
 
-export interface FunnelStep {
-  event_name: string;
+export interface TrendResponse {
+  data: TrendPoint[];
+  breakdown_values?: string[];
 }
 
 export interface FunnelBody {
-  steps: FunnelStep[];
-  from?: string;
-  to?: string;
+  steps: string[];
+  start: string;
+  end: string;
 }
 
 export interface FunnelStepResult {
-  event_name: string;
+  name: string;
   count: number;
-  conversion_rate: number;
+  conversion: number | null;
 }
 
 export interface FunnelResult {
   steps: FunnelStepResult[];
+  overall_conversion: number;
 }
 
 export interface User {
-  distinct_id: string;
+  id: string;
   type: 'user' | 'device';
+  devices: string[];
   first_seen: string;
   last_seen: string;
   event_count: number;
 }
 
-export interface UserProfile extends User {
+export interface ProfileEvent {
+  id: string;
+  event_name: string;
+  timestamp: string;
   properties: Record<string, unknown>;
-  recent_events: ExploreEvent[];
+  device_id: string | null;
+  user_id: string | null;
+}
+
+export interface UserProfile extends User {
+  events: ProfileEvent[];
 }
 
 // ---- Helpers ----
@@ -108,13 +123,22 @@ export function fetchExplore(params: {
   return get<{ events: ExploreEvent[]; total: number }>('/api/explore', params);
 }
 
-export function fetchTrends(params: TrendParams): Promise<{ data: TrendPoint[] }> {
-  const { event, start, end, granularity, measure } = params;
-  return get<{ data: TrendPoint[] }>('/api/trends', { event, start, end, granularity, measure });
+export function fetchTrends(params: TrendParams): Promise<TrendResponse> {
+  const { event, start, end, granularity, measure, aggregation, property, breakdown } = params;
+  return get<TrendResponse>('/api/trends', {
+    event,
+    start,
+    end,
+    granularity,
+    measure,
+    aggregation,
+    property,
+    breakdown,
+  });
 }
 
 export function fetchFunnel(body: FunnelBody): Promise<FunnelResult> {
-  return post<FunnelResult>('/api/funnel', body);
+  return post<FunnelResult>('/api/funnels', body);
 }
 
 export function fetchUsers(params: {
