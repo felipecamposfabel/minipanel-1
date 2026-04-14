@@ -1,8 +1,5 @@
+import { redirect } from 'next/navigation';
+
 export default function Home() {
-  return (
-    <main>
-      <h1>MiniPanel</h1>
-      <p>Dashboard coming soon.</p>
-    </main>
-  );
+  redirect('/explorer');
 }
