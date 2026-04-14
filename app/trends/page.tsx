@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Select, Radio, Spin, Typography } from 'antd';
+import { Select, Radio, Spin, Typography, Alert, Empty } from 'antd';
 import {
   LineChart,
   Line,
@@ -155,13 +155,19 @@ export default function TrendsPage() {
   const pivotedData = isBreakdownActive ? pivotBreakdownData(trendData, breakdownValues) : null;
 
   function renderChart() {
+    const yLabel = measure === 'unique_users' ? 'Unique Users' : aggProperty ? `${aggFunction}(${aggProperty})` : 'Count';
     const xAxis = (
       <XAxis dataKey="period" tickFormatter={(v) => new Date(v as string).toLocaleDateString()} />
     );
-    const yAxis = <YAxis />;
+    const yAxis = (
+      <YAxis label={{ value: yLabel, angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }} width={80} />
+    );
     const grid = <CartesianGrid strokeDasharray="3 3" />;
     const tooltip = (
-      <Tooltip labelFormatter={(v) => new Date(v as string).toLocaleDateString()} />
+      <Tooltip
+        labelFormatter={(v) => new Date(v as string).toLocaleDateString()}
+        formatter={(value: number) => [value.toLocaleString(), yLabel]}
+      />
     );
 
     if (isBreakdownActive && pivotedData) {
@@ -287,7 +293,7 @@ export default function TrendsPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Title level={2} style={{ marginBottom: '24px' }}>
+      <Title level={4} style={{ marginBottom: '24px' }}>
         Trends
       </Title>
 
@@ -413,8 +419,8 @@ export default function TrendsPage() {
 
       {/* Chart area */}
       {!selectedEvent && (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#888' }}>
-          Select an event to see trends
+        <div style={{ padding: '40px 0' }}>
+          <Empty description="Select an event to see trends" />
         </div>
       )}
 
@@ -425,10 +431,22 @@ export default function TrendsPage() {
       )}
 
       {selectedEvent && !loading && error && (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#ff4d4f' }}>{error}</div>
+        <Alert
+          type="error"
+          message="Failed to load trend data"
+          description="There was a problem fetching trend data. Please try again."
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
       )}
 
-      {selectedEvent && !loading && !error && renderChart()}
+      {selectedEvent && !loading && !error && trendData.length === 0 && (
+        <div style={{ padding: '40px 0' }}>
+          <Empty description="No data found for the selected event and date range" />
+        </div>
+      )}
+
+      {selectedEvent && !loading && !error && trendData.length > 0 && renderChart()}
     </div>
   );
 }

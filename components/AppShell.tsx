@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layout, Menu, Switch, Typography } from 'antd';
+import { Layout, Menu, Switch, Typography, Button, theme as antTheme } from 'antd';
 import {
   SearchOutlined,
   LineChartOutlined,
   FunnelPlotOutlined,
   TeamOutlined,
   BulbOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
+import { seedData } from '@/lib/api';
 
 const { Sider, Header, Content } = Layout;
 const { Title } = Typography;
@@ -27,6 +29,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const { token } = antTheme.useToken();
+
+  async function handleSeed() {
+    setSeeding(true);
+    try {
+      await seedData();
+    } catch {
+      // Non-fatal: individual pages handle their own data refresh
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   const selectedKeys = menuItems
     .filter((item) => pathname.startsWith(item.key))
@@ -54,7 +69,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Title
             level={5}
             style={{
-              color: '#722ED1',
+              color: token.colorPrimary,
               margin: 0,
               whiteSpace: 'nowrap',
               transition: 'opacity 0.2s',
@@ -87,17 +102,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             width: '100%',
           }}
         >
-          <Title level={5} style={{ color: '#722ED1', margin: 0 }}>
+          <Title level={5} style={{ color: token.colorPrimary, margin: 0 }}>
             MiniPanel
           </Title>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BulbOutlined style={{ color: isDark ? '#fadb14' : '#bfbfbf' }} />
-            <Switch
-              checked={isDark}
-              onChange={toggleTheme}
-              checkedChildren="Dark"
-              unCheckedChildren="Light"
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Button
+              icon={<DatabaseOutlined />}
+              size="small"
+              loading={seeding}
+              onClick={handleSeed}
+            >
+              Seed Sample Data
+            </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <BulbOutlined style={{ color: isDark ? '#fadb14' : '#bfbfbf' }} />
+              <Switch
+                checked={isDark}
+                onChange={toggleTheme}
+                checkedChildren="Dark"
+                unCheckedChildren="Light"
+              />
+            </div>
           </div>
         </Header>
 

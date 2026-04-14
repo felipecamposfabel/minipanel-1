@@ -140,7 +140,7 @@ export default function ExplorerPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Typography.Title level={3} style={{ marginBottom: 16 }}>
+      <Typography.Title level={4} style={{ marginBottom: 16 }}>
         Event Explorer
       </Typography.Title>
 

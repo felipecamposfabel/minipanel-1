@@ -74,7 +74,12 @@ export default function UserProfilePage() {
         <Button icon={<ArrowLeftOutlined />} onClick={() => router.back()} style={{ marginBottom: 16 }}>
           Back
         </Button>
-        <Alert type="error" message="Failed to load profile" description={error} />
+        <Alert
+          type="error"
+          message="Failed to load profile"
+          description="There was a problem loading this user profile. Please go back and try again."
+          showIcon
+        />
       </div>
     );
   }

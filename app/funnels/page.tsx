@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Select, Radio, Button, Progress, Typography, Spin, Alert } from 'antd';
+import { Select, Radio, Button, Progress, Typography, Spin, Alert, Empty } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { fetchEventNames, fetchFunnel, FunnelResult } from '@/lib/api';
 
@@ -67,7 +67,7 @@ export default function FunnelsPage() {
 
   return (
     <div style={{ padding: '24px', maxWidth: 800 }}>
-      <Title level={2} style={{ marginBottom: '24px' }}>
+      <Title level={4} style={{ marginBottom: '24px' }}>
         Funnel Analysis
       </Title>
 
@@ -144,13 +144,18 @@ export default function FunnelsPage() {
 
       {/* Error state */}
       {!loading && error && (
-        <Alert type="error" message={error} showIcon />
+        <Alert
+          type="error"
+          message="Failed to analyze funnel"
+          description="There was a problem running the funnel analysis. Please check your steps and try again."
+          showIcon
+        />
       )}
 
       {/* Empty state */}
       {!loading && !error && result === null && (
-        <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
-          Add 2–5 steps and click Analyze
+        <div style={{ padding: '40px 0' }}>
+          <Empty description="Add 2–5 steps and click Analyze Funnel" />
         </div>
       )}
 

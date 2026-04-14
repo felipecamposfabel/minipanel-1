@@ -122,7 +122,7 @@ export default function UsersPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Title level={3} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 16 }}>
         Users
       </Title>
 
