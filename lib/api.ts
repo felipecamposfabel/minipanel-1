@@ -13,15 +13,16 @@ export interface ExploreEvent {
 }
 
 export interface TrendPoint {
-  date: string;
-  count: number;
+  period: string;
+  value: number;
 }
 
 export interface TrendParams {
-  event_name: string;
-  from?: string;
-  to?: string;
-  interval?: 'day' | 'week' | 'month';
+  event: string;
+  start?: string;
+  end?: string;
+  granularity?: 'day' | 'week';
+  measure?: 'count' | 'unique_users';
 }
 
 export interface FunnelStep {
@@ -108,8 +109,8 @@ export function fetchExplore(params: {
 }
 
 export function fetchTrends(params: TrendParams): Promise<{ data: TrendPoint[] }> {
-  const { event_name, from, to, interval } = params;
-  return get<{ data: TrendPoint[] }>('/api/trends', { event_name, from, to, interval });
+  const { event, start, end, granularity, measure } = params;
+  return get<{ data: TrendPoint[] }>('/api/trends', { event, start, end, granularity, measure });
 }
 
 export function fetchFunnel(body: FunnelBody): Promise<FunnelResult> {
