@@ -6,6 +6,8 @@ import eventsRouter from './routes/events.js';
 import seedRouter from './routes/seed.js';
 import exploreRouter from './routes/explore.js';
 import trendsRouter from './routes/trends.js';
+import funnelsRouter from './routes/funnels.js';
+import usersRouter from './routes/users.js';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -17,6 +19,8 @@ app.use('/api/events', eventsRouter);
 app.use('/api/seed', seedRouter);
 app.use('/api/explore', exploreRouter);
 app.use('/api/trends', trendsRouter);
+app.use('/api/funnels', funnelsRouter);
+app.use('/api/users', usersRouter);
 
 async function start(): Promise<void> {
   await initDb();
