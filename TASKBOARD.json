@@ -1,0 +1,370 @@
+{
+  "version": "1",
+  "created": "2026-04-14T00:00:00Z",
+  "tickets": [
+    {
+      "id": "T1-001",
+      "tier": 1,
+      "title": "Project scaffold",
+      "description": "Initialize monorepo with single package.json, TypeScript configs, Next.js config, .env.example, .gitignore, and README. Set up npm scripts including concurrently-based npm run dev that starts both Express backend and Next.js frontend.",
+      "requirements": [
+        "MUST have single package.json at project root with all dependencies",
+        "MUST have tsconfig.json that passes npx tsc --noEmit on frontend code",
+        "MUST have next.config.mjs with /api/* rewrites to Express on port 3001",
+        "MUST have npm run dev starting both servers (Express port 3001 + Next.js port 3000) via concurrently",
+        "MUST have .env.example with DATABASE_URL defaulting to local Supabase",
+        "MUST have README.md documenting single start command",
+        "MUST have vitest.config.ts for backend unit tests",
+        "MUST have playwright.config.ts for E2E tests"
+      ],
+      "owners": [
+        "dev-backend"
+      ],
+      "dependencies": [],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T1-002",
+      "tier": 1,
+      "title": "Database schema and connection",
+      "description": "Create PostgreSQL schema (events table, identity_map table with indexes). Implement db.ts connection pool using pg. Implement setup-db.ts that creates tables idempotently on startup. Schema supports identity resolution via device_id\u2192user_id mapping.",
+      "requirements": [
+        "MUST create events table with: id, event_name, device_id, user_id, timestamp, properties (JSONB), created_at",
+        "MUST create identity_map table with: device_id (PK), user_id, created_at, updated_at",
+        "MUST create indexes on events(event_name), events(timestamp DESC), events(device_id), events(user_id), identity_map(user_id)",
+        "MUST export a pg Pool instance from server/db.ts",
+        "MUST have initDb() function that creates tables using CREATE TABLE IF NOT EXISTS",
+        "MUST use DATABASE_URL env var with fallback to local Supabase default"
+      ],
+      "owners": [
+        "dev-backend"
+      ],
+      "dependencies": [
+        "T1-001"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T1-003",
+      "tier": 1,
+      "title": "Event ingestion API and identity resolution \u2014 BR-100 + BR-101",
+      "description": "Implement POST /api/events endpoint. Validate required fields (event_name + at least one of device_id/user_id). Accept optional timestamp (default to server time). Accept arbitrary key-value properties. Return clear errors on invalid events. Persist to PostgreSQL.",
+      "requirements": [
+        "MUST accept POST /api/events with JSON body",
+        "MUST require event_name field \u2014 reject with 400 and clear error if missing",
+        "MUST require at least one identity field (device_id or user_id) \u2014 reject with 400 if both absent",
+        "MUST default timestamp to server time if not provided",
+        "MUST accept arbitrary properties as key-value pairs in properties field",
+        "MUST persist event to database",
+        "MUST return 201 with event id on success",
+        "MUST provide GET /api/events/names returning distinct event names",
+        "MUST provide GET /api/events/properties?event=<name> returning property keys and detected types"
+      ],
+      "owners": [
+        "dev-backend"
+      ],
+      "dependencies": [
+        "T1-002"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T1-004",
+      "tier": 1,
+      "title": "Identity resolution \u2014 BR-101",
+      "description": "Implemented as part of T1-003.",
+      "requirements": [],
+      "owners": [
+        "dev-backend"
+      ],
+      "dependencies": [
+        "T1-003"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T1-005",
+      "tier": 1,
+      "title": "Sample data generator \u2014 BR-102",
+      "description": "Implement POST /api/seed endpoint that populates database with realistic demo data: \u226510 event types, \u226550 resolved users, \u226510,000 events over 30 days. Non-uniform distribution. Include identity resolution scenarios: anonymous\u2192identified, multi-device, never-identified. String and numeric properties.",
+      "requirements": [
+        "MUST implement POST /api/seed endpoint",
+        "MUST generate \u226510 distinct event types",
+        "MUST generate \u226550 resolved users (have user_id)",
+        "MUST generate \u226510,000 total events",
+        "MUST spread events over last 30 days with non-uniform daily distribution",
+        "MUST include anonymous\u2192identified scenarios (device_id only events, then later mapping to user_id)",
+        "MUST include multi-device users (multiple device_ids \u2192 same user_id)",
+        "MUST include never-identified users (device_id only, no mapping)",
+        "MUST include string properties (page, button, plan, feature) and numeric properties (amount, duration, quantity)",
+        "MUST be idempotent \u2014 DELETE existing data then re-insert",
+        "MUST return summary: { events: number, users: number, devices: number }"
+      ],
+      "owners": [
+        "dev-backend"
+      ],
+      "dependencies": [
+        "T1-004"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T1-006",
+      "tier": 1,
+      "title": "Application shell and navigation \u2014 BR-103",
+      "description": "Implement Next.js app shell with Ant Design Layout. Navigation between Explorer, Trends, Funnels, Users sections. Dark/light theme toggle. Ant Design ConfigProvider with Mixpanel-inspired purple accent palette. AntdRegistry for Next.js SSR.",
+      "requirements": [
+        "MUST implement root layout.tsx with AntdRegistry and ConfigProvider",
+        "MUST implement AppShell component with Ant Design Layout (Sider + Header + Content)",
+        "MUST have navigation links to: Explorer, Trends, Funnels, Users",
+        "MUST implement dark/light theme toggle using Ant Design theme tokens",
+        "MUST use Mixpanel-inspired color palette: purple primary (#722ED1 or similar), clean dark background in dark mode",
+        "MUST have no blank pages \u2014 every route renders something",
+        "MUST start with Next.js dev server on port 3000"
+      ],
+      "owners": [
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T1-001"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T2-001",
+      "tier": 2,
+      "title": "Event Explorer \u2014 BR-200",
+      "description": "Implement GET /api/explore endpoint (paginated, filterable) and Event Explorer page. Show reverse-chronological events with timestamp, name, resolved identity, properties. Filter by event name. Pagination for large volumes.",
+      "requirements": [
+        "MUST implement GET /api/explore?event_name=&page=&limit= returning paginated events",
+        "MUST show timestamp, event name, resolved identity (user_id or device_id), and properties in each row",
+        "MUST use resolved identity (COALESCE with identity_map join)",
+        "MUST support filter by event name via dropdown",
+        "MUST implement pagination (50 events per page minimum)",
+        "MUST show loading state while fetching",
+        "MUST show empty state when no events match filter",
+        "MUST show error state if API fails"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T1-003",
+        "T1-004",
+        "T1-006"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T2-002",
+      "tier": 2,
+      "title": "Trend Analysis \u2014 BR-201",
+      "description": "Implement GET /api/trends endpoint and Trends page. Select event type \u2192 volume over time. Measures: total count, unique users (resolved). Time-series chart. Daily/weekly granularity. Date range presets (7d, 30d, 90d) + custom. Default: last 30 days, daily.",
+      "requirements": [
+        "MUST implement GET /api/trends?event=&start=&end=&granularity=day|week&measure=count|unique_users",
+        "MUST compute unique users using resolved identity (COALESCE with identity_map join)",
+        "MUST return time-series array with period and value",
+        "MUST implement Trends page with event selector, date range picker, granularity toggle, measure selector",
+        "MUST render time-series chart using Recharts",
+        "MUST default to last 30 days, daily granularity, count measure",
+        "MUST implement date range presets: 7d, 30d, 90d",
+        "MUST show loading, empty, and error states"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T1-003",
+        "T1-004",
+        "T1-006"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-001",
+      "tier": 3,
+      "title": "Numeric Aggregations \u2014 BR-300",
+      "description": "Extend Trends with sum/avg/min/max on numeric properties. Auto-detect which event properties are numeric. Add aggregation controls to Trends page UI.",
+      "requirements": [
+        "MUST extend GET /api/trends to accept aggregation=sum|avg|min|max and property=<name>",
+        "MUST auto-detect numeric properties for an event type (GET /api/events/properties returns type: 'number' | 'string')",
+        "MUST compute aggregation correctly in SQL using CAST and AVG/SUM/MIN/MAX",
+        "MUST add aggregation selector to Trends UI (only shown when numeric properties available)",
+        "MUST show loading, empty, error states for aggregation results"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T2-002"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-002",
+      "tier": 3,
+      "title": "Comparative Visualization \u2014 BR-301",
+      "description": "Add chart type switcher to Trends page. Minimum: line, bar, area charts. Sensible defaults (line for time series).",
+      "requirements": [
+        "MUST add chart type toggle to Trends page: line, bar, area (minimum 3 types)",
+        "MUST default to line chart for time series data",
+        "MUST render each chart type correctly using Recharts",
+        "MUST preserve all other Trends controls when switching chart type"
+      ],
+      "owners": [
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T2-002"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-003",
+      "tier": 3,
+      "title": "Dimensional Breakdown \u2014 BR-302",
+      "description": "Extend Trends with breakdown by a property value. Show top N values + 'other' grouping. Works with all measures.",
+      "requirements": [
+        "MUST extend GET /api/trends to accept breakdown=<property_name>",
+        "MUST return top 10 values + 'other' bucket in breakdown mode",
+        "MUST work with count, unique_users, and numeric aggregation measures",
+        "MUST add breakdown selector to Trends UI",
+        "MUST render multi-series chart when breakdown is active",
+        "MUST show loading, empty, error states"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T2-002"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-004",
+      "tier": 3,
+      "title": "Funnel Analysis \u2014 BR-303",
+      "description": "Implement POST /api/funnels and Funnels page. Define 2-5 event sequence. Show conversion rate between each step and overall. Uses resolved identities. Respects step order by timestamp.",
+      "requirements": [
+        "MUST implement POST /api/funnels accepting { steps: string[], start: string, end: string }",
+        "MUST compute funnel using resolved identities (anonymous+identified = one user)",
+        "MUST require step order by timestamp (step N must occur after step N-1 for same user)",
+        "MUST return count and conversion rate for each step",
+        "MUST support 2-5 steps",
+        "MUST implement Funnels page with step builder (add/remove events)",
+        "MUST display funnel as visual drop-off chart",
+        "MUST show conversion percentages between steps",
+        "MUST show loading, empty, error states"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T1-003",
+        "T1-004",
+        "T1-006"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-005",
+      "tier": 3,
+      "title": "User Profiles \u2014 BR-304",
+      "description": "Implement GET /api/users and GET /api/users/:id, plus Users search page and User Profile page. Show identity cluster, full event timeline, first/last seen.",
+      "requirements": [
+        "MUST implement GET /api/users?search=&page=&limit= returning paginated user list",
+        "MUST implement GET /api/users/:id returning full user profile",
+        "MUST include identity cluster in profile: all linked device_ids and user_id",
+        "MUST include full event timeline with merged anonymous events",
+        "MUST show first_seen and last_seen timestamps",
+        "MUST show event count",
+        "MUST implement Users search page with identity search",
+        "MUST implement User Profile page with timeline and identity cluster",
+        "MUST show loading, empty, error states on both pages"
+      ],
+      "owners": [
+        "dev-backend",
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T1-003",
+        "T1-004",
+        "T1-006"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    },
+    {
+      "id": "T3-006",
+      "tier": 3,
+      "title": "Visual Coherence \u2014 BR-305",
+      "description": "Polish pass: consistent color palette, typography, chart labels. Verify empty states, loading indicators, error messages on all views. No blank pages, raw errors, or broken layouts.",
+      "requirements": [
+        "MUST use consistent color palette across all views (purple primary, from Ant Design theme tokens)",
+        "MUST have consistent typography using Ant Design type system",
+        "MUST have chart labels on all Recharts components",
+        "MUST verify all views have loading state (Ant Design Spin or Skeleton)",
+        "MUST verify all views have empty state with helpful message",
+        "MUST verify all views have error state with user-friendly message (no raw errors)",
+        "MUST pass npx next build with zero errors"
+      ],
+      "owners": [
+        "dev-frontend"
+      ],
+      "dependencies": [
+        "T3-001",
+        "T3-002",
+        "T3-003",
+        "T3-004",
+        "T3-005"
+      ],
+      "status": "done",
+      "retries": 0,
+      "max_retries": 3,
+      "blockers": []
+    }
+  ]
+}

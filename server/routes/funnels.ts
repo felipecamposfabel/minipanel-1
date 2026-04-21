@@ -31,7 +31,7 @@ step${stepNum}_users AS (
   WHERE e.event_name = ${eventParam}
     AND e.timestamp >= $1 AND e.timestamp < $2
     AND COALESCE(e.user_id, im.user_id) IS NOT NULL
-  GROUP BY uid
+  GROUP BY COALESCE(e.user_id, im.user_id)
 )`);
     } else {
       const prevStep = i;
@@ -45,7 +45,7 @@ step${stepNum}_users AS (
   WHERE e.event_name = ${eventParam}
     AND e.timestamp >= $1 AND e.timestamp < $2
     AND e.timestamp > s.step_ts
-  GROUP BY uid
+  GROUP BY COALESCE(e.user_id, im.user_id)
 )`);
     }
   }

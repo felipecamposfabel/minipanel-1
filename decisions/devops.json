@@ -1,0 +1,25 @@
+{
+  "domain": "devops",
+  "decisions": [
+    {
+      "question": "Project structure",
+      "answer": "Monorepo (single package.json)",
+      "rationale": "Simplest setup. One install, one start command. Backend + Next.js colocated."
+    },
+    {
+      "question": "Startup command",
+      "answer": "npm run dev",
+      "rationale": "Starts both backend API + Next.js frontend via concurrently. Supabase assumed already running on Docker."
+    }
+  ],
+  "guardrails": [
+    "npm install && npx playwright install must be the complete setup sequence",
+    "npm run dev must start the full app",
+    "README must document the single start command",
+    "No external dependencies beyond Supabase on Docker"
+  ],
+  "verification_commands": [
+    "npm run dev --dry-run || true",
+    "test -f README.md"
+  ]
+}

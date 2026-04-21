@@ -1,0 +1,49 @@
+{
+  "domain": "tester",
+  "decisions": [
+    {
+      "question": "Backend test framework",
+      "answer": "Vitest",
+      "rationale": "Fast, native TS/ESM, Jest-compatible API. Modern standard for Node/TypeScript projects."
+    },
+    {
+      "question": "Frontend / integration testing",
+      "answer": "Playwright (E2E)",
+      "rationale": "Tests the real app end-to-end in a browser. Validates actual user flows. Browsers must be installed via 'npx playwright install' after npm install — version must match the project dependency."
+    },
+    {
+      "question": "Coverage strategy",
+      "answer": "Spec verification tests — one test per 'How to verify' block in PROJECT_SPEC.md",
+      "rationale": "Acceptance-test focused. Every spec requirement with a verification scenario gets a corresponding test."
+    },
+    {
+      "question": "Test plan requirement",
+      "answer": "Mandatory test plan per ticket at tests/plans/<ticket-id>.md before writing any test code",
+      "rationale": "Forces the tester to think about what cases to cover, documents the reasoning, and provides an audit trail proving the tester ran for each ticket."
+    },
+    {
+      "question": "Seed data strategy",
+      "answer": "Shared fixture at tests/fixtures/seed.sql (~200 lines) loaded in beforeAll/beforeEach. Must include identity resolution scenarios.",
+      "rationale": "Tests without data are meaningless. Every test must run against realistic data including anonymous-only, anonymous->identified, and multi-device users."
+    }
+  ],
+  "guardrails": [
+    "Every BR-xxx requirement with a 'How to verify' block must have a corresponding test",
+    "Identity resolution must be tested with the exact scenarios from the spec",
+    "E2E tests must run against the real app with sample data loaded",
+    "A test plan (tests/plans/<ticket-id>.md) MUST be committed before test code for every ticket",
+    "Test plan MUST list every MUST requirement and at least one test case per requirement",
+    "Test plan MUST include edge cases (empty input, invalid data, boundary values)",
+    "All tests MUST load tests/fixtures/seed.sql for data — no tests against empty databases",
+    "Seed fixture MUST include anonymous-only, anonymous->identified, and multi-device identity scenarios"
+  ],
+  "environment": {
+    "psql": "/opt/homebrew/opt/libpq/bin/psql",
+    "db_url": "postgresql://postgres:postgres@localhost:54322/postgres",
+    "seed_command": "/opt/homebrew/opt/libpq/bin/psql 'postgresql://postgres:postgres@localhost:54322/postgres' < tests/fixtures/seed.sql"
+  },
+  "verification_commands": [
+    "npx vitest run",
+    "npx playwright test"
+  ]
+}

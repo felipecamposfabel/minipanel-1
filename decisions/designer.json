@@ -1,0 +1,44 @@
+{
+  "domain": "designer",
+  "decisions": [
+    {
+      "question": "Visual direction",
+      "answer": "Mixpanel-inspired",
+      "rationale": "Clean, data-dense, violet-accented. Familiar to analytics users."
+    },
+    {
+      "question": "Theme support",
+      "answer": "Both light and dark mode with toggle, persisted to localStorage, defaulting to OS preference",
+      "rationale": "Best UX. Ant Design supports theming natively via ConfigProvider."
+    },
+    {
+      "question": "Primary font",
+      "answer": "Inter (400, 500, 600) via @fontsource/inter. Monospace: JetBrains Mono for code/IDs.",
+      "rationale": "Inter is the standard for data-dense SaaS UIs. JetBrains Mono for technical content."
+    },
+    {
+      "question": "Color palette",
+      "answer": "Violet accent (#7c3aed light, #a78bfa dark). 8-color chart series defined in BR-306. Semantic: green/red/amber for success/error/warning.",
+      "rationale": "Exact hex values in spec. No ambiguity."
+    },
+    {
+      "question": "Spacing system",
+      "answer": "8px grid. Sidebar 240px fixed. Content 24px padding. Cards 16px padding, 8px radius.",
+      "rationale": "Consistent spatial rhythm. All values defined in BR-305."
+    }
+  ],
+  "guardrails": [
+    "No hex colors outside the palette defined in BR-306 — use CSS variables or Ant Design tokens",
+    "No font-family declarations outside Inter and JetBrains Mono",
+    "No font sizes outside the scale: 12, 13, 14, 16, 24px",
+    "All charts must use the 8-color series palette in order",
+    "All charts must have axis labels, tooltips, and empty states",
+    "Skeleton loaders for loading states — no spinners except in buttons",
+    "Empty states must have icon + text + suggested action",
+    "Error states must be red banner — no raw JSON or stack traces",
+    "Dark and light themes must both be tested — no broken contrast"
+  ],
+  "verification_commands": [
+    "npx next build"
+  ]
+}

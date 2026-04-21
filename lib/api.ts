@@ -150,7 +150,7 @@ export function fetchUsers(params: {
 }
 
 export function fetchUser(id: string, type: 'user' | 'device'): Promise<UserProfile> {
-  return get<UserProfile>(`/api/users/${encodeURIComponent(id)}`, { type });
+  return get<UserProfile>(`/api/users/${id}`, { type });
 }
 
 export function seedData(): Promise<{ events: number; users: number; devices: number }> {

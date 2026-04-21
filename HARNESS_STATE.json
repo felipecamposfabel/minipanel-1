@@ -1,0 +1,5 @@
+{
+  "phase": "done",
+  "domains_complete": ["backend", "frontend", "designer", "devops", "tester"],
+  "current_ticket_id": null
+}

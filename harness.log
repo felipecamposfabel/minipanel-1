@@ -1,0 +1,27 @@
+[2026-04-14T13:45:42] dev-harness starting. project_root=/Users/flea/Developer/minipanel max_iterations=20
+[2026-04-14T13:45:42] ── Iteration 1/20 ── phase=build
+[2026-04-14T14:16:50] Iteration 1 done. duration=1868s phase=build->done
+=== iteration 1 output (head 10) ===
+All tickets complete. Phase is `done`.
+
+---
+
+**MiniPanel is built.** Here's a summary of what was delivered across 13 commits:
+
+| Ticket | What was built |
+|--------|---------------|
+| T1-001 | Monorepo scaffold — `package.json`, tsconfigs, Next.js config, `npm run dev` via concurrently |
+| T1-002 | PostgreSQL schema + `pg` pool — `events`, `identity_map` tables with all indexes |
+--- (tail 10) ---
+| T1-006 | Next.js App Shell — Ant Design Layout, sidebar nav, dark/light theme toggle, purple palette (BR-103) |
+| T2-001 | Event Explorer — paginated table, identity-resolved rows, event name filter (BR-200) |
+| T2-002 | Trend Analysis — time-series LineChart, count/unique-users, 7d/30d/90d presets (BR-201) |
+| T3-001+002+003 | Trends extended — numeric aggregations (sum/avg/min/max), line/bar/area chart switcher, dimensional breakdown with multi-series chart (BR-300, 301, 302) |
+| T3-004 | Funnel Analysis — ordered-step CTEs with resolved identities, conversion rates, visual drop-off bars (BR-303) |
+| T3-005 | User Profiles — identity cluster display, event timeline, device/user search (BR-304) |
+| T3-006 | Visual coherence polish — consistent states, chart labels, no raw errors, `next build` clean (BR-305) |
+| Tests | 7 Vitest unit tests passing (BR-100, 101); Playwright E2E specs written for all 4 views |
+
+**To start:** `npm run dev` (requires Supabase running at `localhost:54322`)
+===
+[2026-04-14T14:16:50] Phase reached 'done'. All tickets complete.

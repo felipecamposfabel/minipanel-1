@@ -1,0 +1,35 @@
+{
+  "domain": "backend",
+  "decisions": [
+    {
+      "question": "Language/runtime",
+      "answer": "Node.js / TypeScript",
+      "rationale": "Shared language with frontend, fast iteration, good ecosystem for web APIs."
+    },
+    {
+      "question": "Database",
+      "answer": "Supabase (PostgreSQL via local Docker)",
+      "rationale": "User already has Supabase running locally on Docker. PostgreSQL handles analytical queries well and Supabase provides a managed Postgres experience."
+    },
+    {
+      "question": "API style",
+      "answer": "REST",
+      "rationale": "Simple and standard. POST /events for ingestion, GET endpoints for queries. No extra tooling needed."
+    },
+    {
+      "question": "Backend framework",
+      "answer": "Express",
+      "rationale": "Ubiquitous, well-known, minimal. Good enough for this use case."
+    }
+  ],
+  "guardrails": [
+    "All source files must be TypeScript (no .js)",
+    "Event ingestion must validate required fields and return clear errors",
+    "Identity resolution must be retroactive",
+    "No external service dependencies beyond Supabase"
+  ],
+  "verification_commands": [
+    "npx tsc --noEmit",
+    "npx vitest run"
+  ]
+}

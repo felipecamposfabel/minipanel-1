@@ -1,0 +1,30 @@
+{
+  "domain": "frontend",
+  "decisions": [
+    {
+      "question": "Frontend framework",
+      "answer": "Next.js",
+      "rationale": "React + routing + SSR built in. Full-featured for a dashboard app."
+    },
+    {
+      "question": "Charting library",
+      "answer": "Recharts",
+      "rationale": "React-native, declarative, good defaults. Most popular for React dashboards."
+    },
+    {
+      "question": "Styling / component library",
+      "answer": "Ant Design",
+      "rationale": "Enterprise-grade, dashboard-friendly, built-in components for tables, forms, navigation. Supports dark mode natively."
+    }
+  ],
+  "guardrails": [
+    "All source files must be TypeScript/TSX",
+    "No blank pages or broken layouts when data is missing",
+    "Empty states, loading indicators, and error messages must be handled",
+    "Charts must use resolved identities for unique user counts"
+  ],
+  "verification_commands": [
+    "npx tsc --noEmit",
+    "npx next build"
+  ]
+}
